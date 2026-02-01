@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple SVG Drawing</title>
+    <title>My Simple Sketchbook</title>
     <style>
         body {
             margin: 0;
@@ -15,7 +15,7 @@
             background-color: #f0f0f0;
             font-family: sans-serif;
         }
-        .board-container {
+        .sketch-container {
             background: white;
             padding: 20px;
             border-radius: 8px;
@@ -45,63 +45,63 @@
 </head>
 <body>
 
-    <div class="board-container">
-        <h1>Drawing Board</h1>
-        <svg id="drawBox" viewBox="0 0 600 400"></svg>
-        <button onclick="clearBoard()">Clear Board</button>
+    <div class="sketch-container">
+        <h1>My Sketchbook</h1>
+        <svg id="paper" viewBox="0 0 600 400"></svg>
+        <button onclick="wipe()">Start Over</button>
     </div>
 
     <script>
-        const svg = document.getElementById('drawBox');
-        let isDrawing = false;
-        let currentLine = null;
+        const paper = document.getElementById('paper');
+        let painting = false;
+        let line = null;
 
-        svg.addEventListener('mousedown', startDrawing);
-        window.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', stopDrawing);
+        paper.addEventListener('mousedown', begin);
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', stop);
 
-        svg.addEventListener('touchstart', (e) => {
+        paper.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            startDrawing(e.touches[0]);
+            begin(e.touches[0]);
         });
-        svg.addEventListener('touchmove', (e) => {
+        paper.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            draw(e.touches[0]);
+            move(e.touches[0]);
         });
-        svg.addEventListener('touchend', stopDrawing);
+        paper.addEventListener('touchend', stop);
 
-        function startDrawing(e) {
-            isDrawing = true;
-            currentLine = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-            currentLine.setAttribute("fill", "none");
-            currentLine.setAttribute("stroke", "black");
-            currentLine.setAttribute("stroke-width", "3");
-            currentLine.setAttribute("stroke-linecap", "round");
-            currentLine.setAttribute("stroke-linejoin", "round");
-            svg.appendChild(currentLine);
-            addPoint(e);
+        function begin(e) {
+            painting = true;
+            line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            line.setAttribute("fill", "none");
+            line.setAttribute("stroke", "black");
+            line.setAttribute("stroke-width", "3");
+            line.setAttribute("stroke-linecap", "round");
+            line.setAttribute("stroke-linejoin", "round");
+            paper.appendChild(line);
+            track(e);
         }
 
-        function draw(e) {
-            if (!isDrawing) return;
-            addPoint(e);
+        function move(e) {
+            if (!painting) return;
+            track(e);
         }
 
-        function stopDrawing() {
-            isDrawing = false;
-            currentLine = null;
+        function stop() {
+            painting = false;
+            line = null;
         }
 
-        function addPoint(e) {
-            const rect = svg.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const points = currentLine.getAttribute("points") || "";
-            currentLine.setAttribute("points", `${points} ${x},${y}`);
+        function track(e) {
+            const area = paper.getBoundingClientRect();
+            const x = e.clientX - area.left;
+            const y = e.clientY - area.top;
+            const points = line.getAttribute("points") || "";
+            line.setAttribute("points", `${points} ${x},${y}`);
         }
 
-        function clearBoard() {
-            svg.innerHTML = '';
+        function wipe() {
+            paper.innerHTML = '';
         }
     </script>
 </body>
